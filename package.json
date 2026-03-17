@@ -1,11 +1,21 @@
 {
-  "name": "heady-headysystems",
+  "name": "@heady/headysystems",
   "version": "1.0.0",
-  "private": true,
+  "description": "HeadySystems — HeadySystems platform service",
+  "main": "src/index.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node src/index.js",
+    "dev": "node --watch src/index.js",
+    "test": "echo \"Tests coming soon\" && exit 0"
   },
   "engines": {
     "node": ">=20.0.0"
-  }
+  },
+  "author": "Heady Systems",
+  "license": "UNLICENSED",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/HeadyMe/headysystems.git"
+  },
+  "keywords": ["heady", "platform"]
 }
