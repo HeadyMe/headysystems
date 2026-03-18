@@ -1,0 +1,12 @@
+# HeadyMCP Expansion Reference
+# This repo is part of the Heady ecosystem
+# Full expansion package is in HeadyAI/Heady and HeadyMe/headymcp
+version: "4.1.0"
+expansion:
+  source_repo: "HeadyAI/Heady"
+  branch: "claude/analyze-heady-architecture-x6bWz"
+  total_tools: 122
+  total_agents: 16
+  total_workflows: 10
+  total_nodes: 24
+  mcp_servers: 7
