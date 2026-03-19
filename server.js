@@ -134,7 +134,7 @@ function proxyToApi(req, res) {
   const proxyReq = client.request(proxyOpts, (proxyRes) => {
     const headers = {
       ...proxyRes.headers,
-      'access-control-allow-origin': '*',
+      'access-control-allow-origin': process.env.CORS_ALLOWED_ORIGINS || 'https://headysystems.com,https://headyme.com,https://headyconnection.com,https://headyconnection.org,https://headyos.com,https://headyio.com,https://headymcp.com,https://headydocs.com,https://headybuddy.com,https://headyfinance.com,https://admin.headysystems.com',
       'access-control-allow-methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
       'access-control-allow-headers': 'Content-Type, Authorization, X-Heady-API-Key',
     };
@@ -161,7 +161,7 @@ const server = http.createServer((req, res) => {
   // CORS preflight
   if (req.method === 'OPTIONS') {
     res.writeHead(204, {
-      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': process.env.CORS_ALLOWED_ORIGINS || 'https://headysystems.com,https://headyme.com,https://headyconnection.com,https://headyconnection.org,https://headyos.com,https://headyio.com,https://headymcp.com,https://headydocs.com,https://headybuddy.com,https://headyfinance.com,https://admin.headysystems.com',
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Heady-API-Key',
       'Access-Control-Max-Age': '86400',
