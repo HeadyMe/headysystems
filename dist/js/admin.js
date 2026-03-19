@@ -14,8 +14,10 @@ const API_BASE = window.location.hostname === 'localhost'
 const EDGE_API = 'https://heady-edge-gateway.emailheadyconnection.workers.dev';
 
 // ── Firebase Config ──
-const firebaseConfig = {
-    apiKey: "AIzaSyCbMSgOFqxZlINbQ5i-UZLM3hNjsRZxE-E",
+// API key loaded at runtime from server-injected window.__FIREBASE_CONFIG__
+// Set FIREBASE_API_KEY env var on the server; never hardcode here.
+const firebaseConfig = (typeof window !== 'undefined' && window.__FIREBASE_CONFIG__) ? window.__FIREBASE_CONFIG__ : {
+    apiKey: "",
     authDomain: "headyweb-d28e1.firebaseapp.com",
     projectId: "headyweb-d28e1",
     storageBucket: "headyweb-d28e1.firebasestorage.app",
@@ -222,7 +224,8 @@ async function chatWithBuddy(message) {
         } else {
             addBuddyMessage('Sorry, I had trouble responding. Try again?', 'buddy');
         }
-    } catch {
+    } catch (err) {
+        console.error('[HeadyBuddy] Chat request failed:', err);
         typing.remove();
         addBuddyMessage('Connection issue. Make sure HeadyManager is running.', 'buddy');
     }
@@ -316,23 +319,24 @@ async function loadDashboard() {
         try {
             const pmRes = await fetch(`${API_BASE}/api/brain/pm2-status`).then(r => r.json());
             renderServices(pmRes);
-        } catch { renderServicesPlaceholder(); }
+        } catch (err) { console.error('[Dashboard] PM2 status fetch failed:', err); renderServicesPlaceholder(); }
 
         // Memory count
         try {
             const memRes = await fetch(`${API_BASE}/api/brain/memory-stats`).then(r => r.json());
             document.getElementById('statMemories').textContent = (memRes.total || memRes.count || 0).toLocaleString();
-        } catch {
+        } catch (err) {
+            console.error('[Dashboard] Memory stats fetch failed:', err);
             document.getElementById('statMemories').textContent = '—';
         }
 
-    } catch { /* Dashboard update failed silently */ }
+    } catch (err) { console.error('[Dashboard] Update failed:', err); }
 
     // Race audit
     try {
         const raceRes = await fetch(`${API_BASE}/api/brain/race-audit`).then(r => r.json());
         renderRaces(raceRes);
-    } catch { /* No race data */ }
+    } catch (err) { console.error('[Dashboard] Race audit fetch failed:', err); }
 }
 
 function renderServices(data) {
@@ -395,7 +399,7 @@ function loadMemoryPage() {
             });
             const data = await res.json();
             renderMemoryResults(data.results || data.memories || []);
-        } catch { document.getElementById('memoryResults').innerHTML = '<p style="color:var(--text-muted)">Query failed</p>'; }
+        } catch (err) { console.error('[Memory] Query failed:', err); document.getElementById('memoryResults').innerHTML = '<p style="color:var(--text-muted)">Query failed</p>'; }
     };
 
     document.getElementById('memIngestBtn').onclick = async () => {
@@ -409,7 +413,7 @@ function loadMemoryPage() {
             });
             showToast('Memory stored!', 'success');
             document.getElementById('memoryIngest').value = '';
-        } catch { showToast('Failed to store', 'error'); }
+        } catch (err) { console.error('[Memory] Store failed:', err); showToast('Failed to store', 'error'); }
     };
 }
 

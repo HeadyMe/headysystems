@@ -13,6 +13,30 @@ const API_TARGET = process.env.API_TARGET || 'https://manager.headysystems.com';
 const DIST = path.join(__dirname, 'dist');
 const SERVICE_NAME = 'headysystems';
 
+const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || [
+  'https://headysystems.com',
+  'https://www.headysystems.com',
+  'https://manager.headysystems.com',
+].join(',')).split(',').map(o => o.trim()).filter(Boolean);
+
+function getAllowedOrigin(req) {
+  const origin = req.headers['origin'] || '';
+  return ALLOWED_ORIGINS.includes(origin) ? origin : ALLOWED_ORIGINS[0];
+}
+
+
+// ── Runtime config endpoint: serves Firebase config from env vars ──
+const FIREBASE_CONFIG_JS = (() => {
+  const cfg = {
+    apiKey: process.env.FIREBASE_API_KEY || '',
+    authDomain: process.env.FIREBASE_AUTH_DOMAIN || 'headyweb-d28e1.firebaseapp.com',
+    projectId: process.env.FIREBASE_PROJECT_ID || 'headyweb-d28e1',
+    storageBucket: process.env.FIREBASE_STORAGE_BUCKET || 'headyweb-d28e1.firebasestorage.app',
+    messagingSenderId: process.env.FIREBASE_MESSAGING_SENDER_ID || '1093838638453',
+    appId: process.env.FIREBASE_APP_ID || '1:1093838638453:web:d20d06186063fe26ce978f',
+  };
+  return 'window.__FIREBASE_CONFIG__ = ' + JSON.stringify(cfg) + ';';
+})();
 const MIME = {
   '.html': 'text/html',
   '.css': 'text/css',
@@ -134,9 +158,10 @@ function proxyToApi(req, res) {
   const proxyReq = client.request(proxyOpts, (proxyRes) => {
     const headers = {
       ...proxyRes.headers,
-      'access-control-allow-origin': '*',
+      'access-control-allow-origin': getAllowedOrigin(req),
       'access-control-allow-methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
       'access-control-allow-headers': 'Content-Type, Authorization, X-Heady-API-Key',
+      'vary': 'Origin',
     };
     res.writeHead(proxyRes.statusCode, headers);
     proxyRes.pipe(res);
@@ -161,12 +186,21 @@ const server = http.createServer((req, res) => {
   // CORS preflight
   if (req.method === 'OPTIONS') {
     res.writeHead(204, {
-      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': getAllowedOrigin(req),
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Heady-API-Key',
       'Access-Control-Max-Age': '86400',
+      'Vary': 'Origin',
     });
     res.end();
+    return;
+  }
+
+
+  // Runtime config (Firebase config from env — never hardcode secrets)
+  if (req.url === '/config.js') {
+    res.writeHead(200, { 'Content-Type': 'application/javascript', 'Cache-Control': 'no-store', ...SECURITY_HEADERS });
+    res.end(FIREBASE_CONFIG_JS);
     return;
   }
 

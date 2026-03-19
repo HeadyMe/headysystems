@@ -474,7 +474,7 @@
 
     init() {
       // 1. Load preferences
-      try { const saved = localStorage.getItem('heady_contexts'); if (saved) this.savedContexts = JSON.parse(saved); } catch(e){}
+      try { const saved = localStorage.getItem('heady_contexts'); if (saved) this.savedContexts = JSON.parse(saved); } catch(e){ console.error('[heady_contexts] JSON parse failed:', e); }
       
       // 2. Headyme Onboarding check
       if (document.getElementById('headyOnboarding')) {

@@ -90,7 +90,7 @@
 
     // Check for stored auth
     const stored = localStorage.getItem('heady_user');
-    if (stored) { try { user = JSON.parse(stored); showUser(); } catch { } }
+    if (stored) { try { user = JSON.parse(stored); showUser(); } catch (e) { console.error('[HeadyBuddy] Failed to parse stored user:', e); } }
 
     authBtn.onclick = async () => {
         // Simple email-based auth for now (Firebase can be layered on later)
