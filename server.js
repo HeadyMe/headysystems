@@ -12,6 +12,11 @@ const PORT = process.env.PORT || 8080;
 const API_TARGET = process.env.API_TARGET || 'https://manager.headysystems.com';
 const DIST = path.join(__dirname, 'dist');
 const SERVICE_NAME = 'headysystems';
+const ALLOWED_ORIGINS = new Set([
+  'https://headysystems.com', 'https://headyapi.com', 'https://headymcp.com',
+  'https://headyme.com', 'https://headyos.com', 'https://headyconnection.com',
+  'https://headyio.com', 'https://headydocs.com',
+]);
 
 const MIME = {
   '.html': 'text/html',
@@ -47,6 +52,8 @@ const SECURITY_HEADERS = {
   'X-XSS-Protection': '1; mode=block',
   'Referrer-Policy': 'strict-origin-when-cross-origin',
   'Strict-Transport-Security': 'max-age=31536000; includeSubDomains',
+  'Content-Security-Policy': "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: blob: https:; connect-src 'self' https://manager.headysystems.com; frame-src 'none'; object-src 'none'",
+  'Permissions-Policy': 'camera=(), microphone=(), geolocation=()',
 };
 
 function getCacheControl(ext) {
@@ -134,7 +141,7 @@ function proxyToApi(req, res) {
   const proxyReq = client.request(proxyOpts, (proxyRes) => {
     const headers = {
       ...proxyRes.headers,
-      'access-control-allow-origin': '*',
+      'access-control-allow-origin': ALLOWED_ORIGINS.has(req.headers.origin) ? req.headers.origin : 'https://headysystems.com',
       'access-control-allow-methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
       'access-control-allow-headers': 'Content-Type, Authorization, X-Heady-API-Key',
     };
@@ -145,7 +152,7 @@ function proxyToApi(req, res) {
   proxyReq.on('error', (err) => {
     console.error('[Proxy] Error: ' + err.message);
     res.writeHead(502, { 'Content-Type': 'application/json' });
-    res.end(JSON.stringify({ ok: false, error: 'API proxy failed: ' + err.message }));
+    res.end(JSON.stringify({ ok: false, error: 'API proxy unavailable' }));
   });
 
   proxyReq.on('timeout', () => {
@@ -161,7 +168,7 @@ const server = http.createServer((req, res) => {
   // CORS preflight
   if (req.method === 'OPTIONS') {
     res.writeHead(204, {
-      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Origin': ALLOWED_ORIGINS.has(req.headers.origin) ? req.headers.origin : 'https://headysystems.com',
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
       'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Heady-API-Key',
       'Access-Control-Max-Age': '86400',
