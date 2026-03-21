@@ -162,6 +162,16 @@
       .buddy-panel { width: calc(100vw - 32px); right: 16px; bottom: 80px; }
       .auth-modal { padding: 24px; }
     }
+    .eco-footer{padding:60px 0 40px;border-top:1px solid var(--border,rgba(255,255,255,.06));margin-top:auto}
+    .eco-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:32px;max-width:1200px;margin:0 auto;padding:0 24px}
+    .eco-col h4{font-size:.75rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:var(--accent,#818cf8);margin-bottom:16px}
+    .eco-col a{display:block;color:var(--text-muted,rgba(255,255,255,.6));font-size:.82rem;text-decoration:none;padding:4px 0;transition:color .2s}
+    .eco-col a:hover{color:var(--text,#e2e8f0)}
+    .eco-bottom{max-width:1200px;margin:40px auto 0;padding:24px 24px 0;border-top:1px solid var(--border,rgba(255,255,255,.06));text-align:center;color:var(--text-muted,rgba(255,255,255,.5));font-size:.75rem}
+    .eco-bottom a{color:var(--accent,#818cf8);text-decoration:none}
+    .eco-mantra{font-size:.7rem;margin-top:6px;letter-spacing:.1em;opacity:.7}
+    @media(max-width:768px){.eco-grid{grid-template-columns:repeat(2,1fr);gap:24px}}
+    @media(max-width:480px){.eco-grid{grid-template-columns:1fr}}
   </style>
 </head>
 <body>
@@ -264,18 +274,40 @@
         </div>
       </section>
 
-      <footer>
-        <div style="display:flex;justify-content:center;gap:24px;flex-wrap:wrap;margin-bottom:16px;">
-          <a href="https://headysystems.com" style="color:var(--text-muted);text-decoration:none;font-size:0.7rem;">HeadySystems</a>
-          <a href="https://headyme.com" style="color:var(--text-muted);text-decoration:none;font-size:0.7rem;">HeadyMe</a>
-          <a href="https://headyio.com" style="color:var(--text-muted);text-decoration:none;font-size:0.7rem;">HeadyIO</a>
-          <a href="https://headyapi.com" style="color:var(--text-muted);text-decoration:none;font-size:0.7rem;">HeadyAPI</a>
-          <a href="https://headymcp.com" style="color:var(--text-muted);text-decoration:none;font-size:0.7rem;">HeadyMCP</a>
-          <a href="https://headyos.com" style="color:var(--text-muted);text-decoration:none;font-size:0.7rem;">HeadyOS</a>
-          <a href="https://headyconnection.org" style="color:var(--text-muted);text-decoration:none;font-size:0.7rem;">HeadyConnection</a>
-          <a href="https://headybuddy.org" style="color:var(--text-muted);text-decoration:none;font-size:0.7rem;">HeadyBuddy</a>
+      <footer class="eco-footer">
+        <div class="eco-grid">
+          <div class="eco-col">
+            <h4>Platform</h4>
+            <a href="https://headyme.com">HeadyMe — Command Center</a>
+            <a href="https://headyos.com">HeadyOS — AI Operating System</a>
+            <a href="https://headybuddy.org">HeadyBuddy — AI Companion</a>
+            <a href="https://headyconnection.org">HeadyConnection — Nonprofit</a>
+          </div>
+          <div class="eco-col">
+            <h4>Developers</h4>
+            <a href="https://headyio.com">HeadyIO — Developer Portal</a>
+            <a href="https://headymcp.com">HeadyMCP — Protocol Hub</a>
+            <a href="https://headyapi.com">HeadyAPI — REST API</a>
+            <a href="https://headydocs.com">HeadyDocs — Documentation</a>
+          </div>
+          <div class="eco-col">
+            <h4>Infrastructure</h4>
+            <a href="https://headysystems.com">HeadySystems — Platform Core</a>
+            <a href="https://admin.headysystems.com">Command Center Dashboard</a>
+            <a href="https://headyio.com/downloads.html">Downloads & CLI Tools</a>
+          </div>
+          <div class="eco-col">
+            <h4>Resources</h4>
+            <a href="https://headydocs.com#architecture">Architecture Guide</a>
+            <a href="https://headydocs.com#pqc">Security & PQC</a>
+            <a href="https://headydocs.com#sdk">Hive SDK Reference</a>
+            <a href="https://headydocs.com#hcfp">Auto-Success Engine</a>
+          </div>
         </div>
-        © 2026 HeadySystems — ∞ SACRED GEOMETRY ∞ — Powered by HCFP Auto-Success
+        <div class="eco-bottom">
+          <p>© 2024-2026 HeadySystems Inc. All Rights Reserved. | <a href="https://headyconnection.org">HeadyConnection Inc. 501(c)(3)</a></p>
+          <p class="eco-mantra">Sacred Geometry :: Organic Systems :: Breathing Interfaces</p>
+        </div>
       </footer>
     </div>
   </div>
