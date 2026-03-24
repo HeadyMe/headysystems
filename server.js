@@ -13,6 +13,55 @@ const API_TARGET = process.env.API_TARGET || 'https://manager.headysystems.com';
 const DIST = path.join(__dirname, 'dist');
 const SERVICE_NAME = 'headysystems';
 
+// ─── CORS Whitelist (replaces wildcard '*') ──────────────────────────────────
+const ALLOWED_ORIGINS = new Set([
+  'https://headyme.com',
+  'https://www.headyme.com',
+  'https://headysystems.com',
+  'https://www.headysystems.com',
+  'https://headyconnection.org',
+  'https://www.headyconnection.org',
+  'https://headybuddy.org',
+  'https://www.headybuddy.org',
+  'https://headymcp.com',
+  'https://www.headymcp.com',
+  'https://headyio.com',
+  'https://www.headyio.com',
+  'https://headybot.com',
+  'https://www.headybot.com',
+  'https://headyapi.com',
+  'https://www.headyapi.com',
+  'https://heady-ai.com',
+  'https://www.heady-ai.com',
+  'https://auth.headysystems.com',
+  'https://admin.headysystems.com',
+  'https://api.headysystems.com',
+  'https://headyme-site-667608982461.us-central1.run.app',
+  'https://heady-edge-gateway-609590223909.us-central1.run.app',
+]);
+
+function isOriginAllowed(origin) {
+  if (!origin) return false;
+  if (ALLOWED_ORIGINS.has(origin)) return true;
+  // Allow Cloud Run preview URLs
+  if (/\.us-central1\.run\.app$/.test(origin)) return true;
+  return false;
+}
+
+function getCorsHeaders(reqOrigin) {
+  const headers = {
+    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Heady-API-Key',
+    'Access-Control-Max-Age': '86400',
+  };
+  if (isOriginAllowed(reqOrigin)) {
+    headers['Access-Control-Allow-Origin'] = reqOrigin;
+    headers['Access-Control-Allow-Credentials'] = 'true';
+  }
+  return headers;
+}
+// ─── End CORS ────────────────────────────────────────────────────────────────
+
 const MIME = {
   '.html': 'text/html',
   '.css': 'text/css',
@@ -119,6 +168,7 @@ function serveStatic(req, res) {
 }
 
 function proxyToApi(req, res) {
+  const origin = req.headers.origin || '';
   const targetUrl = new URL(req.url, API_TARGET);
   const client = targetUrl.protocol === 'https:' ? https : http;
 
@@ -132,11 +182,10 @@ function proxyToApi(req, res) {
   };
 
   const proxyReq = client.request(proxyOpts, (proxyRes) => {
+    const corsHeaders = getCorsHeaders(origin);
     const headers = {
       ...proxyRes.headers,
-      'access-control-allow-origin': '*',
-      'access-control-allow-methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-      'access-control-allow-headers': 'Content-Type, Authorization, X-Heady-API-Key',
+      ...corsHeaders,
     };
     res.writeHead(proxyRes.statusCode, headers);
     proxyRes.pipe(res);
@@ -158,14 +207,12 @@ function proxyToApi(req, res) {
 }
 
 const server = http.createServer((req, res) => {
+  const origin = req.headers.origin || '';
+
   // CORS preflight
   if (req.method === 'OPTIONS') {
-    res.writeHead(204, {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
-      'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Heady-API-Key',
-      'Access-Control-Max-Age': '86400',
-    });
+    const corsHeaders = getCorsHeaders(origin);
+    res.writeHead(204, corsHeaders);
     res.end();
     return;
   }
