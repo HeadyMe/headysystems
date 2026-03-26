@@ -236,15 +236,15 @@ const server = http.createServer((req, res) => {
 });
 
 server.listen(PORT, '0.0.0.0', () => {
-  console.log('[' + SERVICE_NAME + '] Production server on http://0.0.0.0:' + PORT);
-  console.log('[' + SERVICE_NAME + '] API proxy -> ' + API_TARGET);
+  process.stdout.write(JSON.stringify({ level: 'info', service: SERVICE_NAME, message: 'Production server on http://0.0.0.0:' + PORT, ts: new Date().toISOString() }) + '\n');
+  process.stdout.write(JSON.stringify({ level: 'info', service: SERVICE_NAME, message: 'API proxy -> ' + API_TARGET, ts: new Date().toISOString() }) + '\n');
 });
 
 // Graceful shutdown
 function shutdown(signal) {
-  console.log('[' + SERVICE_NAME + '] Received ' + signal + ', shutting down gracefully...');
+  process.stdout.write(JSON.stringify({ level: 'info', service: SERVICE_NAME, message: 'Received ' + signal + ', shutting down gracefully...', ts: new Date().toISOString() }) + '\n');
   server.close(() => {
-    console.log('[' + SERVICE_NAME + '] Server closed.');
+    process.stdout.write(JSON.stringify({ level: 'info', service: SERVICE_NAME, message: 'Server closed.', ts: new Date().toISOString() }) + '\n');
     process.exit(0);
   });
   setTimeout(() => {
